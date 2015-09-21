@@ -1,4 +1,17 @@
 % CFL Number
-0.95
+0.9
+%
 % Max timesteps
-650
+150
+%
+% Input filename
+160x160_sidetunnel3_100mdomain.bkcfd
+%
+% Output Filename
+160x160_sidetunnel3_100mdomain_output_firstorder.txt
+%
+% Debug Mode On? 1 for Yes or 0 for No
+False
+%
+% Which limiter do you want? 1 for harmonic mean, 2 for first order upwind, 3 for lax-wendroff, 4 for Double Minmod/Van Leers
+2

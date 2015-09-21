@@ -8,27 +8,27 @@ grid = struct;
 
 % Make sure test section is square
 xmin = 0;
-xmax = 100;
-ymin = -50;
-ymax = 50;
+xmax = 5;
+ymin = -2.5;
+ymax = 2.5;
 
-numcells_x = 120;
-numcells_y = 120;
+numcells_x = 5;
+numcells_y = 5;
 
 % this is all in meters, not in cell-widths
-tunnel_width = 10;
-tunnel_length = 50;
+tunnel_width = 0;
+tunnel_length = 0;
 
-sidetunnel_height = 15; %Must have more than two cells!
-sidetunnel_lengthback = 20;
-sidetunnel_lengthforward = 20;
-sidetunnel_width = 5;
-sidetunnel_xstart = 25;
+sidetunnel_height = 0; %Must have more than two cells!
+sidetunnel_lengthback = 0;
+sidetunnel_lengthforward = 0;
+sidetunnel_width = 0;
+sidetunnel_xstart = 0;
 
 grid_plotting = 1;
 
 
-% Calculation for setup
+%% Calculation for setup
 dx = (xmax-xmin)/numcells_x;
 dy = (ymax-ymin)/numcells_y;
 

@@ -33,7 +33,7 @@ struct cell {
 
 
 //This is used to read the parameters from the parameter file
-std::vector<double> read_parameters(std::string filename);
+std::vector<std::string> read_parameters(std::string filename);
 
 //This is used to read the input node locations and cell connectivity from the given input_filename
 void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma);
