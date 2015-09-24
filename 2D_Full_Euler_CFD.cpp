@@ -85,7 +85,7 @@ int main() {
 	std::vector<cell> grid;
 
 	std::ofstream textout;
-	textout.open("temp.txt");
+	textout.open("debug_file.txt");
 
 	// Read parameters from input file defined by filename string
 	parameters = read_parameters(parameter_filename);

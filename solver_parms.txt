@@ -5,13 +5,13 @@
 150
 %
 % Input filename
-160x160_sidetunnel3_100mdomain.bkcfd
+grid_files/160x160_sidetunnel3_100mdomain.bkcfd
 %
 % Output Filename
-160x160_sidetunnel3_100mdomain_output_firstorder.txt
+postProcessing/160x160_sidetunnel3_100mdomain_output_firstorder.txt
 %
 % Debug Mode On? True or False
 False
 %
 % Which limiter do you want? 1 for harmonic mean, 2 for first order upwind, 3 for lax-wendroff, 4 for Van Leers
-4
+3
