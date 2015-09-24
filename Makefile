@@ -48,4 +48,4 @@ test1: all
 
 # ------------------ Cleans your folder --------------------
 clean:
-	rm -f *.o letterman
+	rm -f *.o *~ *.swp 2D_Full_Euler_CFD
