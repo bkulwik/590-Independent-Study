@@ -516,10 +516,10 @@ void compute_slope(TDstate &slope_minus, TDstate &slope_plus, int direction, TDs
 void compute_limiter(TDstate &limiter_value, TDstate slope_minus, TDstate slope_plus, int limiter_number) {
 	
 	TDstate r;
-	r.rho = slope_plus.rho/slope_minus.rho;
-	r.rhou = slope_plus.rhou/slope_minus.rhou;
-	r.rhov = slope_plus.rhov/slope_minus.rhov;
-	r.E = slope_plus.E/slope_minus.E;
+	r.rho = slope_minus.rho/slope_plus.rho;
+	r.rhou = slope_minus.rhou/slope_plus.rhou;
+	r.rhov = slope_minus.rhov/slope_plus.rhov;
+	r.E = slope_minus.E/slope_plus.E;
 
 	if (limiter_number == 1) { // Harmonic
 		harmonic_limiter(limiter_value, slope_minus, slope_plus, r);
@@ -546,44 +546,27 @@ void harmonic_limiter(TDstate &limiter_value, TDstate slope_minus, TDstate slope
 */
 
 	limiter_value.rho = (2*r.rho)/(1+r.rho);
+	if (isnan(limiter_value.rho)) {limiter_value.rho = 0;}
 	limiter_value.rhou = (2*r.rhou)/(1+r.rhou);
+	if (isnan(limiter_value.rhou)) {limiter_value.rhou = 0;}
 	limiter_value.rhov = (2*r.rhov)/(1+r.rhov);
+	if (isnan(limiter_value.rhov)) {limiter_value.rhov = 0;}
 	limiter_value.E = (2*r.E)/(1+r.E);
+	if (isnan(limiter_value.E)) {limiter_value.E = 0;}
 }
 
-// Also known as "double minmod", this computes the van leers limiter and returns TDstate limiter_value
+// This computes the van leers limiter and returns TDstate limiter_value
 void van_leers_limiter(TDstate &limiter_value, TDstate slope_minus, TDstate slope_plus, TDstate r) {
-	if (r.rho < 1/3) {
-		limiter_value.rho = 2*r.rho;
-	} else if (r.rho < 3) {
-		limiter_value.rho = 1+r.rho/2;
-	} else {
-		limiter_value.rho = 2;
-	}
 
-	if (r.rhou < 1/3) {
-		limiter_value.rhou = 2*r.rhou;
-	} else if (r.rhou < 3) {
-		limiter_value.rhou = 1+r.rhou/2;
-	} else {
-		limiter_value.rhou = 2;
-	}
+	limiter_value.rho = (r.rho + std::abs(r.rho))/(1+std::abs(r.rho));
+	limiter_value.rhou = (r.rhou + std::abs(r.rhou))/(1+std::abs(r.rhou));
+	limiter_value.rhov = (r.rhov + std::abs(r.rhov))/(1+std::abs(r.rhov));
+	limiter_value.E = (r.E + std::abs(r.E))/(1+std::abs(r.E));
 
-	if (r.rhov < 1/3) {
-		limiter_value.rhov = 2*r.rhov;
-	} else if (r.rhov < 3) {
-		limiter_value.rhov = 1+r.rhov/2;
-	} else {
-		limiter_value.rhov = 2;
-	}
-
-	if (r.E < 1/3) {
-		limiter_value.E = 2*r.E;
-	} else if (r.E < 3) {
-		limiter_value.E = 1+r.E/2;
-	} else {
-		limiter_value.E = 2;
-	}
+	if (isnan(limiter_value.rho)) {limiter_value.rho = 0;}
+	if (isnan(limiter_value.rhou)) {limiter_value.rhou = 0;}
+	if (isnan(limiter_value.rhov)) {limiter_value.rhov = 0;}
+	if (isnan(limiter_value.E)) {limiter_value.E = 0;}
 }
 
 // Used to compute cell fluxes using the specified limiter for the F and G calculation to update from U(t) to U(t+1/2)
@@ -594,7 +577,7 @@ void compute_limited_flux(std::vector<TDstate>& flux, const TDstate& limiter_val
 	assert(flux.size() == 2);
 
 //	std::cout << "In CLF: center_state = " << center_state.rho << " " << center_state.rhou << " " << center_state.rhov << " " << center_state.E << '\n';
-
+/*
 	double a = CFL*0.625/0.00113534;//CFL*dx/dt;
 
 	tempflux.rho = a*(center_state.rho + 1/2*limiter_value.rho*(1-CFL));
@@ -608,10 +591,10 @@ void compute_limited_flux(std::vector<TDstate>& flux, const TDstate& limiter_val
 	tempflux.rhov = a*(center_state.rhov - 1/2*limiter_value.rhov*(1-CFL));
 	tempflux.E = a*(center_state.E - 1/2*limiter_value.E*(1-CFL));
 	flux[1] = tempflux;
+*/
 
 
-
-/* This is the code that was used for correctly completing the first order calculatons for the 623 project.
+// This is the code that was used for correctly completing the first order calculatons for the 623 project.
 
 	minus_limited_state.rho = center_state.rho - 0.5*slope_minus.rho*limiter_value.rho*(1-CFL);
 	minus_limited_state.rhou = center_state.rhou - 0.5*slope_minus.rhou*limiter_value.rhou*(1-CFL);
@@ -632,7 +615,7 @@ void compute_limited_flux(std::vector<TDstate>& flux, const TDstate& limiter_val
 	flux[0] = (tempflux);
 	compute_cell_flux(tempflux, plus_limited_state, direction, gamma);
 	flux[1] = (tempflux);
-*/
+
 }
 
 
