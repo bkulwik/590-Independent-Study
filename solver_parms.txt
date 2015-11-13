@@ -1,0 +1,20 @@
+% CFL Number
+0.95
+%
+% Max timesteps
+1000
+%
+% Input filename - *.bkcfd or *.obkcfd
+grid_files/half_CDnozzle_sonic.bkcfd
+%
+% Output Filename - *.obkcfd
+postProcessing/test.obkcfd
+%
+% Debug Mode On? True or False
+False
+%
+% Which flux do you want to use? 1 for Roe flux, 2 for Rusanov Flux, 3 for Exact Riemann Flux
+2
+%
+% Which limiter do you want? 1 for harmonic mean, 2 for first order upwind, 3 for lax-wendroff, 4 for Van Leers, 5 for Superbee
+2
