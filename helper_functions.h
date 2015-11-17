@@ -19,7 +19,7 @@ double vectormin(std::vector<double>& locations, bool absolute_value);
 std::vector<int> find_interior_cells(const std::vector<cell>& grid);
 
 // Compute dt based on current wavespeeds and the cell hydraulic diameter and CFL number
-void timestep_calculator(double& dt, double gamma, const std::vector<cell>& grid, const std::vector<TDstate>& Up1, double CFL, const std::vector<directional_quantity>& cell_edge_lengths, const std::vector<double>& cell_diameter, const std::vector<double>& cell_perimeter);
+void timestep_calculator(double& dt, double gamma, const std::vector<cell>& grid, const std::vector<TDstate>& Up1, double CFL, const std::vector<double>& cell_diameter, const std::vector<double>& cell_perimeter);
 
 // Outputs the global state U to the terminal
 void outputU(std::vector<TDstate>& U);
@@ -42,4 +42,9 @@ void compute_outward_unit_normal(const cell& current_cell, std::vector<double>& 
 // Computes area of a cell given the cell's cornerlocs information contained in the cell struct
 double compute_cell_area(cell& current_cell);
 
+// Compute and return cell edge lengths in a directional_quantity
+void compute_cell_distances(std::vector<cell>& grid, directional_quantity& cell_distance, unsigned int& cellposition);
+
+// Compute and return (in cell_edge_lengths) the edge lengths of this cell. Used in read_grid.cpp
+void compute_cell_edge_length(cell& current_cell, directional_quantity& cell_edge_lengths);
 //==============================================================

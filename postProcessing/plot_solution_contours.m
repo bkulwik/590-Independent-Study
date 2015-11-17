@@ -20,7 +20,8 @@ function plot_solution_contours( filename, equal, contour_lines, num_divisions )
 
 close all
 gamma = 1.4;
-Cv = 287/0.4;
+R = 287;
+Cv = R/(gamma-1);
 colormap_color = 'jet';
 
 M = csvread([filename '.obkcfd'],1,0);
@@ -29,7 +30,7 @@ y_node_loc = M(:,6:9);
 rho_long = M(:,15);
 rhou = M(:,16);
 rhov = M(:,17);
-E = M(:,18);
+rhoE = M(:,18);
 
 num_cells_x = length(unique(x_node_loc)) - 1;
 num_cells_y = (length(M)+4)/num_cells_x;
@@ -57,9 +58,9 @@ for ix = 1:num_cells_x
         u(ix,iy) = rhou(list_number)/rho_long(list_number);
         v(ix,iy) = rhov(list_number)/rho_long(list_number);
         rho(ix,iy) = rho_long(list_number);
-        P(ix,iy) = (gamma-1)*(E(list_number) - rho_long(list_number)*(u(ix,iy)^2 + v(ix,iy)^2)/2);
-        T(ix,iy) = (E(list_number) - rho_long(list_number)*vel_mag(ix,iy)^2/2)/Cv;
-
+        P(ix,iy) = (gamma-1)*(rhoE(list_number) - rho_long(list_number)*(vel_mag(ix,iy)^2)/2);
+        T(ix,iy) = (rhoE(list_number)/rho_long(list_number) - rho_long(list_number)*vel_mag(ix,iy)^2/2)/Cv;
+        
         list_number = list_number + 1;
     end
 end

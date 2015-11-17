@@ -75,7 +75,7 @@ std::vector<int> find_interior_cells(const std::vector<cell>& grid) {
 }
 
 
-void timestep_calculator(double& dt, double gamma, const std::vector<cell>& grid, const std::vector<TDstate>& Up1, double CFL, const std::vector<directional_quantity>& cell_edge_lengths, const std::vector<double>& cell_diameter, const std::vector<double>& cell_perimeter) {
+void timestep_calculator(double& dt, double gamma, const std::vector<cell>& grid, const std::vector<TDstate>& Up1, double CFL, const std::vector<double>& cell_diameter, const std::vector<double>& cell_perimeter) {
 
 	double a_adjacent, a_center, UV_adjacent, UV_center, wave1_speed, wave2_speed;
 	dt = pow(10,10);
@@ -116,16 +116,16 @@ void timestep_calculator(double& dt, double gamma, const std::vector<cell>& grid
 
 			switch (edge) {
 				case 0:
-					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*cell_edge_lengths[cellnum].bottom;
+					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*grid[cellnum].edge_lengths.bottom;
 					break;
 				case 1:
-					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*cell_edge_lengths[cellnum].right;
+					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*grid[cellnum].edge_lengths.right;
 					break;
 				case 2:
-					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*cell_edge_lengths[cellnum].top;
+					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*grid[cellnum].edge_lengths.top;
 					break;
 				case 3:
-					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*cell_edge_lengths[cellnum].left;
+					edge_weighted_average_wavespeed = edge_weighted_average_wavespeed + std::max(std::abs(wave1_speed),std::abs(wave2_speed))*grid[cellnum].edge_lengths.left;
 					break;
 				default:
 					std::cout << "Error in computing timesteps... edge number " << edge << '\n';
@@ -238,6 +238,7 @@ void compute_outward_unit_normal(const cell& current_cell, std::vector<double>& 
 }
 
 // Computes area of a cell given the cell's cornerlocs information contained in the cell struct
+// Area is computed as magnitude of cross product of diagonals
 double compute_cell_area(cell& current_cell) {
 	double x_vector1, x_vector2, y_vector1, y_vector2, area;
 	
@@ -248,5 +249,37 @@ double compute_cell_area(cell& current_cell) {
 
 	area = std::abs(0.5*(x_vector1*y_vector2 - x_vector2*y_vector1));
 
+// Alternate way to calculate: compute cell areas using Gauss's Area Formula
+//		area = 0.5*std::abs(grid[cellnum].cornerlocs_x[0]*grid[cellnum].cornerlocs_y[1] + grid[cellnum].cornerlocs_x[1]*grid[cellnum].cornerlocs_y[2] + grid[cellnum].cornerlocs_x[2]*grid[cellnum].cornerlocs_y[3] + grid[cellnum].cornerlocs_x[3]*grid[cellnum].cornerlocs_y[0] - grid[cellnum].cornerlocs_x[1]*grid[cellnum].cornerlocs_y[0] - grid[cellnum].cornerlocs_x[2]*grid[cellnum].cornerlocs_y[1] - grid[cellnum].cornerlocs_x[3]*grid[cellnum].cornerlocs_y[2] - grid[cellnum].cornerlocs_x[0]*grid[cellnum].cornerlocs_y[3]);
 	return(area);
+}
+
+
+void compute_cell_distances(std::vector<cell>& grid, directional_quantity& cell_distance, unsigned int& cellposition) {
+	directional_quantity delta;
+	directional_quantity delta_x, delta_y;
+
+	delta_x.left 	= (grid[grid[cellposition].adjacent_cells_gridpos[0]].centroid_x - grid[cellposition].centroid_x);
+	delta_y.left 	= (grid[grid[cellposition].adjacent_cells_gridpos[0]].centroid_y - grid[cellposition].centroid_y);
+	delta_x.bottom = (grid[grid[cellposition].adjacent_cells_gridpos[1]].centroid_x - grid[cellposition].centroid_x);
+	delta_y.bottom = (grid[grid[cellposition].adjacent_cells_gridpos[1]].centroid_y - grid[cellposition].centroid_y);
+	delta_x.right 	= (grid[grid[cellposition].adjacent_cells_gridpos[2]].centroid_x - grid[cellposition].centroid_x);
+	delta_y.right 	= (grid[grid[cellposition].adjacent_cells_gridpos[2]].centroid_y - grid[cellposition].centroid_y);
+	delta_x.top 	= (grid[grid[cellposition].adjacent_cells_gridpos[3]].centroid_x - grid[cellposition].centroid_x);
+	delta_y.top 	= (grid[grid[cellposition].adjacent_cells_gridpos[3]].centroid_y - grid[cellposition].centroid_y);
+
+	cell_distance.left 	= sqrt(pow(delta_x.left,2) 	+ pow(delta_y.left,2));
+	cell_distance.right 	= sqrt(pow(delta_x.right,2) 	+ pow(delta_y.right,2));
+	cell_distance.bottom = sqrt(pow(delta_x.bottom,2) 	+ pow(delta_y.bottom,2));
+	cell_distance.top 	= sqrt(pow(delta_x.top,2) 		+ pow(delta_y.top,2));
+
+}
+
+void compute_cell_edge_length(cell& current_cell, directional_quantity& cell_edge_lengths) {
+	
+	cell_edge_lengths.bottom	= sqrt(pow((current_cell.cornerlocs_x[1]-current_cell.cornerlocs_x[0]),2) + pow((current_cell.cornerlocs_y[1]-current_cell.cornerlocs_y[0]),2));
+	cell_edge_lengths.right 	= sqrt(pow((current_cell.cornerlocs_x[2]-current_cell.cornerlocs_x[1]),2) + pow((current_cell.cornerlocs_y[2]-current_cell.cornerlocs_y[1]),2));
+	cell_edge_lengths.top 		= sqrt(pow((current_cell.cornerlocs_x[3]-current_cell.cornerlocs_x[2]),2) + pow((current_cell.cornerlocs_y[3]-current_cell.cornerlocs_y[2]),2));
+	cell_edge_lengths.left 		= sqrt(pow((current_cell.cornerlocs_x[0]-current_cell.cornerlocs_x[3]),2) + pow((current_cell.cornerlocs_y[0]-current_cell.cornerlocs_y[3]),2));
+
 }

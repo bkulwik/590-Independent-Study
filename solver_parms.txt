@@ -1,11 +1,11 @@
 % CFL Number
-0.95
+0.9
 %
 % Max timesteps
-1000
+50
 %
 % Input filename - *.bkcfd or *.obkcfd
-grid_files/half_CDnozzle_sonic.bkcfd
+grid_files/160x160_sidetunnel3_100mdomain.bkcfd
 %
 % Output Filename - *.obkcfd
 postProcessing/test.obkcfd

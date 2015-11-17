@@ -6,12 +6,19 @@ close all
 gamma = 1.4;
 
 M = csvread(filename);
-x_node_loc = M(:,1:4);
-y_node_loc = M(:,5:8);
-rho = M(:,9);
-rhou = M(:,10);
-rhov = M(:,11);
-E = M(:,12);
+%x_node_loc = M(:,1:4);
+%y_node_loc = M(:,5:8);
+%rho = M(:,9);
+%rhou = M(:,10);
+%rhov = M(:,11);
+%rhoE = M(:,12);
+
+x_node_loc = M(:,2:5);
+y_node_loc = M(:,6:9);
+rho = M(:,15);
+rhou = M(:,16);
+rhov = M(:,17);
+rhoE = M(:,18);
 
 
 for k = 1:size(x_node_loc,1)
@@ -23,10 +30,10 @@ vel_mag = sqrt((rhou./rho).^2+(rhov./rho).^2);
 u = rhou./rho;
 v = rhov./rho;
 
-P = (gamma-1).*(E - rho.*vel_mag.^2./2);
+P = (gamma-1).*(rhoE - rho.*vel_mag.^2./2);
 
 Cv = 287/0.4;
-T = (E - rho.*vel_mag.^2./2)./Cv;
+T = (rhoE - rho.*vel_mag.^2./2)./Cv;
 
 figure(1);
 scatter(x_cellcenter, y_cellcenter, 50, P, 'square', 'filled')

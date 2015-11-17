@@ -22,6 +22,13 @@ struct TDstate { // TDstate for 2-dimensional state
 	double rhoE;
 };
 
+struct directional_quantity {
+	double left;
+	double bottom;
+	double right;
+	double top;
+};
+ 
 struct cell {
 	int cellnumber;
 	std::vector<double> cornerlocs_x; //bottom left, bottom right, top right, top left
@@ -35,15 +42,9 @@ struct cell {
 	int edge_type;
 	TDstate state;
 	double area;
+	directional_quantity cell_distance; //distance between left, bottom, right and top cell's centroids and current cell's centroids
+	directional_quantity edge_lengths;
 };
-
-struct directional_quantity {
-	double left;
-	double bottom;
-	double right;
-	double top;
-};
- 
 
 
 //This is used to read the parameters from the parameter file

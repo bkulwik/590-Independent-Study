@@ -84,6 +84,8 @@ void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma
 					sep_loc_old = sep_loc_new;
 				}
 
+				// Compute cell edge lengths and assign
+				compute_cell_edge_length(grid[cell_num], grid[cell_num].edge_lengths);
 
 				// Read edge_cell boolean
 				sep_loc_new = line.find(',',sep_loc_old+1);
@@ -116,19 +118,10 @@ void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma
 					grid[cell_num].adjacent_cells_gridpos.push_back(find_cellposition(grid, grid[cell_num].adjacent_cells[1])); // bottom
 					grid[cell_num].adjacent_cells_gridpos.push_back(find_cellposition(grid, grid[cell_num].adjacent_cells[2])); // right
 					grid[cell_num].adjacent_cells_gridpos.push_back(find_cellposition(grid, grid[cell_num].adjacent_cells[3])); // top
-				
-/*					std::cout << "Cell: " << grid[cell_num].cellnumber << '\n';
-
-					std::cout << "cornerlocs_x: " << grid[cell_num].cornerlocs_x[0] << " " << grid[cell_num].cornerlocs_x[1] << " " << grid[cell_num].cornerlocs_x[2] << " " << grid[cell_num].cornerlocs_x[3] << "\n";
-
-					std::cout << "cornerlocs_y: " << grid[cell_num].cornerlocs_y[0] << " " << grid[cell_num].cornerlocs_y[1] << " " << grid[cell_num].cornerlocs_y[2] << " " << grid[cell_num].cornerlocs_y[3] << "\n";
-
-					std::cout << "Adjacent Cell Number: " << grid[cell_num].adjacent_cells[0] << " " << grid[cell_num].adjacent_cells[1] << " " << grid[cell_num].adjacent_cells[2] << " " << grid[cell_num].adjacent_cells[3] << "\n";
-
-					std::cout << "Adjacent Cell Gridpositions: " << grid[cell_num].adjacent_cells_gridpos[0] << " " << grid[cell_num].adjacent_cells_gridpos[1] << " " << grid[cell_num].adjacent_cells_gridpos[2] << " " << grid[cell_num].adjacent_cells_gridpos[3] << "\n";
-
-					std::cout << "X Centroid: " << grid[cell_num].centroid_x << "; Y Centroid: " << grid[cell_num].centroid_y << "\n\n";
-*/
+					
+					if (grid[cell_num].edge_type == 0) {
+						compute_cell_distances(grid, grid[cell_num].cell_distance, cell_num);
+					}
 				}
 				break;
 			}
