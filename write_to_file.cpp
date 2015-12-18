@@ -2,7 +2,7 @@
 #include "helper_functions.h"
 #include <iostream>
 #include <fstream>
-
+#include <iomanip>
 
 void output_4doubles(const std::vector<double>& cornerlocs, std::ofstream& ofile);
 
@@ -31,7 +31,7 @@ void write_to_file(const std::vector<cell>& grid, const std::vector<TDstate>& U,
 
 void output_4doubles(const std::vector<double>& to_output, std::ofstream& ofile) {
 	for(unsigned int index = 0; index < 4; ++index) {
-		ofile << to_output[index] << ",";
+		ofile << std::setprecision(10) << to_output[index] << ",";
 	}
 }
 
@@ -43,5 +43,5 @@ void output_4ints(const std::vector<int>& to_output, std::ofstream& ofile) {
 
 void output_state(const TDstate& U, std::ofstream& ofile) {
 	ofile << U.rho << "," << U.rhou << "," << U.rhov << "," << U.rhoE << ",";
-}
 
+}

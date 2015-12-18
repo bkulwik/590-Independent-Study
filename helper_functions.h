@@ -19,7 +19,7 @@ double vectormin(std::vector<double>& locations, bool absolute_value);
 std::vector<int> find_interior_cells(const std::vector<cell>& grid);
 
 // Compute dt based on current wavespeeds and the cell hydraulic diameter and CFL number
-void timestep_calculator(double& dt, double gamma, const std::vector<cell>& grid, const std::vector<TDstate>& Up1, double CFL, const std::vector<double>& cell_diameter, const std::vector<double>& cell_perimeter);
+double timestep_calculator(double gamma, const std::vector<cell>& grid, const std::vector<TDstate>& Up1, double CFL, const std::vector<double>& cell_diameter, const std::vector<double>& cell_perimeter);
 
 // Outputs the global state U to the terminal
 void outputU(std::vector<TDstate>& U);
@@ -47,4 +47,12 @@ void compute_cell_distances(std::vector<cell>& grid, directional_quantity& cell_
 
 // Compute and return (in cell_edge_lengths) the edge lengths of this cell. Used in read_grid.cpp
 void compute_cell_edge_length(cell& current_cell, directional_quantity& cell_edge_lengths);
-//==============================================================
+
+// Compute and return (in edge_directional_flux) the directional flux for this cell edge from the F and G fluxes
+void compute_edge_normal_flux(TDstate& F, TDstate& G, double x_normal, double y_normal, TDstate& edge_directional_flux);
+
+// Compute weighted flux - take edge's directional flux and multiply by scalar double edge_length
+void weight_flux_with_area(TDstate& flux_to_weight, double edge_length);
+
+// Output sum of residuals to terminal
+void output_residual_sum(std::vector<TDstate>& residuals);

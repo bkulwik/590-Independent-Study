@@ -1,0 +1,5 @@
+*.swp
+*~
+*.o
+2D_Full_Euler_CFD
+postProcessing/*.txt

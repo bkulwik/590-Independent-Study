@@ -16,6 +16,7 @@
 
  "cellnumber","cornerlocs_x","cornerlocs_y","adjacent_cells","initial_conditions",
  0,0,0.125,0.125,0,0,0,1.3333,1.3333,0,0,2,9,1,0,0,250000,
+
 */
 
 void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma)  {
@@ -25,7 +26,8 @@ void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma
 	int sep_loc_old, sep_loc_new;
 	int linenumber = 1;
 	int cell_num = 0;
-	std::vector<double> unit_normals_x_temp, unit_normals_y_temp;
+	std::vector<double> unit_normals_x_temp {0.0,0.0,0.0,0.0}, unit_normals_y_temp {0.0,0.0,0.0,0.0};
+
 
 	std::ifstream input_file(input_filename);
 	if (input_file.is_open()) {
@@ -41,7 +43,6 @@ void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma
 				sep_loc_1 = line.find(',');
 				std::string cell_number_str = line.substr(0, sep_loc_1);
 				grid[cell_num].cellnumber = (std::stoi(cell_number_str));
-				
 
 				// Read corner node x locations and compute x centroid
 				sep_loc_old = sep_loc_1;
@@ -72,8 +73,8 @@ void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma
 
 				// Compute unit_normals_x and unit_normals_y now that we have cell position
 				compute_outward_unit_normal(grid[cell_num], unit_normals_x_temp, unit_normals_y_temp);
-				grid[cell_num].unit_normals_x = unit_normals_x_temp;
-				grid[cell_num].unit_normals_y = unit_normals_y_temp;
+				grid[cell_num].outward_unit_normals_x = unit_normals_x_temp;
+				grid[cell_num].outward_unit_normals_y = unit_normals_y_temp;
 
 
 				// Read adjacent cells				
@@ -83,6 +84,7 @@ void read_grid(std::string input_filename, std::vector<cell> &grid, double gamma
 					grid[cell_num].adjacent_cells.push_back(std::stod(adjacentcell_temp));
 					sep_loc_old = sep_loc_new;
 				}
+
 
 				// Compute cell edge lengths and assign
 				compute_cell_edge_length(grid[cell_num], grid[cell_num].edge_lengths);

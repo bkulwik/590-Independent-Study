@@ -8,11 +8,19 @@ grid = struct;
 
 % Make sure test section is square
 xmin = 0;
+<<<<<<< HEAD
 xmax = 100;
 ymin = -2.5;
 ymax = 2.5;
 
 numcells_x = 100;
+=======
+xmax = 5;
+ymin = -2.5;
+ymax = 2.5;
+
+numcells_x = 5;
+>>>>>>> 17ad69c5380b7b1b13c7ff68440461df59fb056b
 numcells_y = 5;
 
 % this is all in meters, not in cell-widths

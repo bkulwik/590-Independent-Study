@@ -33,10 +33,10 @@ struct cell {
 	int cellnumber;
 	std::vector<double> cornerlocs_x; //bottom left, bottom right, top right, top left
 	double centroid_x;
-	std::vector<double> unit_normals_x; //left, bottom, right, top - outward unit normals
+	std::vector<double> outward_unit_normals_x; //left, bottom, right, top - outward unit normals
 	std::vector<double> cornerlocs_y; //bottom left, bottom right, top right, top left
 	double centroid_y;
-	std::vector<double> unit_normals_y; //left, bottom, right, top - outward unit normals
+	std::vector<double> outward_unit_normals_y; //left, bottom, right, top - outward unit normals
 	std::vector<int> adjacent_cells; //left, bottom, right, top
 	std::vector<int> adjacent_cells_gridpos; //left, bottom, right, top
 	int edge_type;
@@ -44,8 +44,9 @@ struct cell {
 	double area;
 	directional_quantity cell_distance; //distance between left, bottom, right and top cell's centroids and current cell's centroids
 	directional_quantity edge_lengths;
+	double E;
+	double pressure;
 };
-
 
 //This is used to read the parameters from the parameter file
 std::vector<std::string> read_parameters(std::string filename);

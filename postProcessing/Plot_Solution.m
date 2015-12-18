@@ -5,7 +5,8 @@ function Plot_Solution( filename )
 close all
 gamma = 1.4;
 
-M = csvread(filename);
+M = csvread(filename,1,0);
+
 %x_node_loc = M(:,1:4);
 %y_node_loc = M(:,5:8);
 %rho = M(:,9);
@@ -20,7 +21,6 @@ rhou = M(:,16);
 rhov = M(:,17);
 rhoE = M(:,18);
 
-
 for k = 1:size(x_node_loc,1)
     x_cellcenter(k) = mean(x_node_loc(k,:));
     y_cellcenter(k) = mean(y_node_loc(k,:));
@@ -34,6 +34,7 @@ P = (gamma-1).*(rhoE - rho.*vel_mag.^2./2);
 
 Cv = 287/0.4;
 T = (rhoE - rho.*vel_mag.^2./2)./Cv;
+
 
 figure(1);
 scatter(x_cellcenter, y_cellcenter, 50, P, 'square', 'filled')

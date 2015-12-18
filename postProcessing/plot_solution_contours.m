@@ -27,26 +27,49 @@ colormap_color = 'jet';
 M = csvread([filename '.obkcfd'],1,0);
 x_node_loc = M(:,2:5);
 y_node_loc = M(:,6:9);
+cell_type = M(:,14);
 rho_long = M(:,15);
 rhou = M(:,16);
 rhov = M(:,17);
 rhoE = M(:,18);
 
-num_cells_x = length(unique(x_node_loc)) - 1;
-num_cells_y = (length(M)+4)/num_cells_x;
+num_cells = sum(cell_type == 0);
 
-if (num_cells_x * num_cells_y) ~= (length(M) + 4)
+%num_cells_x = length(unique(x_node_loc)) - 1;
+%num_cells_y = (length(M)+4)/num_cells_x;
+
+% Check for num_cells_y by looking at the first column of ghost cells. y
+% values decrease from the first cell until the last of the first column,
+% when the jump back up. When they jump back up, the previous cell was the
+% num_cells_y.
+num_cells_y = 1;
+iterator = 2;
+while 1
+    if(y_node_loc(iterator) < y_node_loc(iterator-1))
+        num_cells_y = num_cells_y + 1;
+        iterator = iterator + 1;
+    else
+        break
+    end    
+end
+
+% Check for num_cells_x by taking the total number of cells, subtracting
+% the L and R ghost cells, and dividing to see how many columns of y cells
+% + 2 ghost cells fit. 
+num_cells_x = (size(M,1) - 2*num_cells_y)/(num_cells_y+2);
+
+if (num_cells_x * num_cells_y) ~= num_cells
     fprintf('\n\nError in determining number of x and y cells, exiting...\n\n')
     return
 end
 
 
 list_number = 1;
-for ix = 1:num_cells_x
-    for iy = 1:num_cells_y
-        if (ix == 1 || ix == num_cells_x) && (iy == 1 || iy == num_cells_y)
-            continue
-        elseif (ix == 1 || ix == num_cells_x || iy == 1 || iy == num_cells_y)
+for ix = 1:num_cells_x + 2
+    for iy = 1:num_cells_y + 2
+        if (ix == 1 || ix == num_cells_x + 2) && (iy == 1 || iy == num_cells_y + 2) %+2 for the far L and R ghost cells
+            continue %There is no cell here - the corner ghost cells do not exist
+        elseif (ix == 1 || ix == num_cells_x + 2 || iy == 1 || iy == num_cells_y + 2)
             list_number = list_number + 1;
             continue
         end
@@ -81,6 +104,7 @@ P = P(2:end,2:end);
 P = P';
 T = T(2:end,2:end);
 T = T';
+a = sqrt(gamma*R.*T);
 
 
 figure(1);
@@ -164,6 +188,22 @@ if ~contour_lines
 end
 
 figure(6);
+[q conthandle] = contourf(x_cellcenter, y_cellcenter, vel_mag./a, num_divisions);
+colorbar;
+colormap jet;
+
+set(conthandle, 'LineStyle','none')
+xlabel('X Position (m)')
+ylabel('Y Position (m)')
+title('Mach Number')
+if (equal)
+    axis equal
+end
+if ~contour_lines
+    set(conthandle, 'LineStyle','none')
+end
+
+figure(7);
 [q conthandle] = contourf(x_cellcenter, y_cellcenter, T, num_divisions);
 colorbar;
 colormap jet;

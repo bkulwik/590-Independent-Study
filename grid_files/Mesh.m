@@ -6,18 +6,18 @@ clc
 
 % What is the horizontal and vertical spacing?
 
-num_cells_x = 150;
-num_cells_y = 30;
+num_cells_x = 101;
+num_cells_y = 10;
 
 % What is the rough size of domain
-xmin = -0.1;
-xmax = 0.6;
-ymin = -0.1;
-ymax = 0.2;
+xmin = -15;
+xmax = 100;
+ymin = -15;
+ymax = 50;
 
 %%%%%%%%%%%%%% DO NOT EDIT THIS %%%%%%%%%%%%%%%%
-x = linspace(xmin,xmax,5000);
-y = linspace(ymin,ymax,5000);
+x = linspace(xmin,xmax,5001);
+y = linspace(ymin,ymax,5001);
 syms x_sym y_sym
 %%%%%%%%%%%%%% DO NOT EDIT THIS %%%%%%%%%%%%%%%%
 
@@ -27,40 +27,41 @@ syms x_sym y_sym
 % edge_state = 3: pressure inlet
 
 % Define left line and boundary type
-xL = 0;
-boundary.left = 3;
+xL = -y./3;
+boundary.left = 1;
 
 % Define bottom line and boundary type
-yB = 0;
-yB_sym = 0;
+yB = x./3;
+yB_sym = x_sym/3;
 boundary.bottom = 1;
 
 % Define right line and boundary type
-xR = 0.5;
-boundary.right = 2;
+xR = -y./3+100; %0.5
+boundary.right = 1;
 
 % Define top line and boundary type
-yT = -6.1363.*x.^4 + 5.0939.*x.^3 - 0.5857.*x.^2 - 0.1119.*x + 0.1023;
-yT_sym = -6.1363.*x_sym.^4 + 5.0939.*x_sym.^3 - 0.5857.*x_sym.^2 - 0.1119.*x_sym + 0.1023;
+yT = x./3 + 10;%-6.1363.*x.^4 + 5.0939.*x.^3 - 0.5857.*x.^2 - 0.1119.*x + 0.1023;
+yT_sym = x_sym/3 + 10;%-6.1363.*x_sym.^4 + 5.0939.*x_sym.^3 - 0.5857.*x_sym.^2 - 0.1119.*x_sym + 0.1023;
 boundary.top = 1;
 
 % Define global initial conditions
-global_initial.rho  = 2.5;
-global_initial.rhou = 625;
+global_initial.rho  = 1;
+global_initial.rhou = 0;
 global_initial.rhov = 0;
-global_initial.rhoE = 1906600;
+global_initial.rhoE = 200000;
 
 % The initial conditions on the "perturbed" boundary
-perturbed_initial.rho  = 2.5;
-perturbed_initial.rhou = 625;
+perturbed_initial.rho  = 1;
+perturbed_initial.rhou = 0;
 perturbed_initial.rhov = 0;
-perturbed_initial.rhoE = 1906600;
+perturbed_initial.rhoE = 200000;
 
-filename = 'half_CDnozzle_sonic_lowinletvel';
+filename = '10x101_shock_rotated';
 
 % Enter number of decimal places with which to round your node locations
-round_xnodes = 4;
-round_ynodes = 4;
+precision_x = 4;
+precision_y = 4;
+%precision = 2;
 
 % Do you want to plot the grid after it is defined?
 plot_grid = 1;
@@ -113,6 +114,7 @@ for corner = 1:4
             break
         end
     end
+    disp(['Creating mesh... ' num2str(corner/4*100) '% Complete'])
     
     if corner == 1
         x_BL = x_intersect;
@@ -145,9 +147,14 @@ for ix = 1:num_cells_x+1
     y_nodes(:,ix) = linspace(y_top(ix), y_bottom(ix), num_cells_y + 1);
 end
 
+% Add in nodes for ghost cells - outside of what is currently defined (just
+% nodes for interior cells)
+
+% Add in left and right ghost cells
 x_nodes = [x_nodes(:,1) + (x_nodes(:,1)-x_nodes(:,2)), x_nodes, x_nodes(:,end) + (x_nodes(:,end)-x_nodes(:,end-1))];
 y_nodes = [y_nodes(:,1) + (y_nodes(:,1)-y_nodes(:,2)), y_nodes, y_nodes(:,end) + (y_nodes(:,end)-y_nodes(:,end-1))];
 
+% Add in bottom and top ghost cells
 x_nodes = [x_nodes(1,:) + (x_nodes(1,:)-x_nodes(2,:)); x_nodes; x_nodes(end,:) + (x_nodes(end,:)-x_nodes(end-1,:))];
 y_nodes = [y_nodes(1,:) + (y_nodes(1,:)-y_nodes(2,:)); y_nodes; y_nodes(end,:) + (y_nodes(end,:)-y_nodes(end-1,:))];
 
@@ -159,10 +166,8 @@ x_nodes(end,1) = nan;
 x_nodes(end,end) = nan;
 y_nodes(isnan(x_nodes)) = nan;
 
-x_nodes = round(x_nodes.*(10^round_xnodes))./(10^round_xnodes);
-
-y_nodes = round(y_nodes.*(10^round_ynodes))./(10^round_ynodes);
-
+%x_nodes = round(x_nodes.*(10^round_xnodes))./(10^round_xnodes);
+%y_nodes = round(y_nodes.*(10^round_ynodes))./(10^round_ynodes);
 
 
 %% Set grid values
@@ -249,7 +254,7 @@ for pointnum = 1:numel(y_nodes)
         % if the edge state of current cell is 3 (pressure inlet) or in the
         % first or second column (left-most ghost cells or first column of
         % solution
-        if (grid.edge_state(cellnum,1) == 3) || ((ismember(column,[1 2])) && (~ismember(row,[1 num_cells_y+2])))
+        if (grid.edge_state(cellnum,1) == 3) || (ismember(column,[1])) % || ((ismember(column,[1 2])) && (~ismember(row,[1 num_cells_y+2])))
             grid.initial_conditions(cellnum,1:4) = [perturbed_initial.rho perturbed_initial.rhou perturbed_initial.rhov perturbed_initial.rhoE];
         else
             grid.initial_conditions(cellnum,1:4) = [global_initial.rho global_initial.rhou global_initial.rhov global_initial.rhoE];
@@ -269,13 +274,14 @@ grid.adjacent_cells(grid.adjacent_cells > max(grid.cellnumber)) = -2;
         
 
 %% Write this all to a .bkcfd file
-fprintf('Writing to .bkcfd file...\n')
-struct2csv(grid,[filename '.bkcfd'])
+fprintf(['Writing to file ' filename '.bkcfd...\n'])
+write_gridfile(grid,[filename '.bkcfd'],precision_x, precision_y)
 
 if plot_grid
     figure;
     hold on
     plot(xL,y,x,yB,xR,y,x,yT)
-    plot(grid.cornerlocs_x,grid.cornerlocs_y,'.','MarkerSize',10)
+    plot(round(grid.cornerlocs_x.*10^precision_x)./10^precision_x,round(grid.cornerlocs_y.*10^precision_y)./10^precision_y,'.','MarkerSize',10)
+    axis equal
 end
 

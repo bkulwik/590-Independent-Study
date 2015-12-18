@@ -31,6 +31,7 @@ ODstate Exact_Riemann_Solver(ODstate left, ODstate right, double left_parallelve
 	left_TD.rhov = left.rho*left_parallelvel;
 	left_TD.rhoE = left.rhoE;	
 
+
 	right_TD.rho = right.rho;
 	right_TD.rhou = right.rhou;
 	right_TD.rhov = right.rho*right_parallelvel;
@@ -324,9 +325,9 @@ ODstate compute_zerostate(const std::vector<double>& wavespeeds, const ODstate& 
 			press_calculation_state.rhov = left_parallelvel*left.rho;
 			press_calculation_state.rhoE = left.rhoE;
 
+
 			press_l = compute_pressure_2D(press_calculation_state, gamma);
 			press = press_l*pow((2/(gamma+1) + (gamma-1)/(a_l*(gamma+1))*(left.rhou/left.rho)),((2*gamma)/(gamma-1)));
-
 
 			in_raref.rhoE = (press/(gamma-1) - pow(in_raref.rhou,2)/(2*in_raref.rho));
 			return(in_raref);		
@@ -351,10 +352,12 @@ ODstate compute_zerostate(const std::vector<double>& wavespeeds, const ODstate& 
 			press_calculation_state.rhov = right_parallelvel*right.rho;
 			press_calculation_state.rhoE = right.rhoE;
 
+
 			press_r = compute_pressure_2D(press_calculation_state, gamma);
 			press = press_r*pow((2/(gamma+1) - (gamma-1)/(a_r*(gamma+1))*(right.rhou/right.rho)),((2*gamma)/(gamma-1)));
 
 			in_raref.rhoE = (press/(gamma-1) - pow(in_raref.rhou,2)/(2*in_raref.rho));
+
 			return(in_raref);	
 		}
 //		else if ((left_wavenumber == 3) && type.left == 2 && type.right == 2) { // left shock and right shock and x=0 is to the right of everything - should never be accessed
@@ -374,10 +377,12 @@ ODstate compute_zerostate(const std::vector<double>& wavespeeds, const ODstate& 
 			press_calculation_state.rhov = right_parallelvel*right.rho;
 			press_calculation_state.rhoE = right.rhoE;
 
+
 			press_r = compute_pressure_2D(press_calculation_state, gamma);
 			press = press_r*pow((2/(gamma+1) - (gamma-1)/(a_r*(gamma+1))*(right.rhou/right.rho)),((2*gamma)/(gamma-1)));
 
 			in_raref.rhoE = (press/(gamma-1) - pow(in_raref.rhou,2)/(2*in_raref.rho));
+
 			return(in_raref);	
 		}
 //		else if ((left_wavenumber == 4) && type.left == 2) { // left shock and x=0 to the right of everything - should never be accessed!

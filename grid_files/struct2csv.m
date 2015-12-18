@@ -1,10 +1,11 @@
-function struct2csv(s,fn)
-% STRUCT2CSV(s,fn)
+function struct2csv(grid_struct,filename,precision)
+% struct2csv(struct,filename,precision)
 %
 % Output a structure to a comma delimited file with column headers
 %
-%       s : any structure composed of one or more matrices and cell arrays
-%      fn : file name
+%           struct : any structure composed of one or more matrices and cell arrays
+%         filename : file name
+%        precision : Number of decimal places to output with numbers
 %
 %      Given s:
 %
@@ -35,61 +36,68 @@ function struct2csv(s,fn)
 % Covered by the BSD License
 %
 
-FID = fopen(fn,'w');
-headers = fieldnames(s);
-m = length(headers);
-sz = zeros(m,2);
+FID = fopen(filename,'w');
+headers = fieldnames(grid_struct);
+num_fieldnames = length(headers);
+field_sizes = zeros(num_fieldnames,2);
 
-t = length(s);
+num_struct_elements = length(grid_struct);
 
-for rr = 1:t
+for current_element = 1:num_struct_elements
   %  fprintf('%f percent done writing grid...', rr/t*100);
     l = '';
-    for ii = 1:m
-        sz(ii,:) = size(s(rr).(headers{ii}));   
-        if ischar(s(rr).(headers{ii}))
-            sz(ii,2) = 1;
+    for rowindex = 1:num_fieldnames
+        field_sizes(rowindex,:) = size(grid_struct(current_element).(headers{rowindex}));   
+        if ischar(grid_struct(current_element).(headers{rowindex}))
+            field_sizes(rowindex,2) = 1;
         end
-        l = [l,'"',headers{ii},'",'];%,repmat(',',1,sz(ii,2)-1)]; %%HERE
+        l = [l,'"',headers{rowindex},'",'];%,repmat(',',1,sz(ii,2)-1)]; %%HERE
     end
 
     l = [l,'\n'];
 
     fprintf(FID,l);
 
-    n = max(sz(:,1));
+    max_num_field_rows = max(field_sizes(:,1));
 
-    for ii = 1:n
+    for rowindex = 1:max_num_field_rows
         l = '';
-        for jj = 1:m
-            c = s(rr).(headers{jj});
+        for current_field_index = 1:num_fieldnames
+            c = grid_struct(current_element).(headers{current_field_index});
             str = '';
             
-            if sz(jj,1)<ii
-                str = repmat(',',1,sz(jj,2));
+            %If current field has at less than the current rowindex number of rows, don't write anything for this
+            if field_sizes(current_field_index,1) < rowindex 
+                str = repmat(',',1,field_sizes(current_field_index,2));
             else
                 if isnumeric(c)
-                    for kk = 1:sz(jj,2)
-                        str = [str,num2str(c(ii,kk)),','];
+                    if findstr('cornerlocs',headers{current_field_index}) %If this is a corner location
+                        for kk = 1:field_sizes(current_field_index,2)
+                            str = [str,num2str(c(rowindex,kk),precision),','];
+                        end
+                    else
+                        for kk = 1:field_sizes(current_field_index,2)
+                            str = [str,num2str(c(rowindex,kk)),','];
+                        end
                     end
                 elseif islogical(c)
-                    for kk = 1:sz(jj,2)
-                        str = [str,num2str(double(c(ii,kk))),','];
+                    for kk = 1:field_sizes(current_field_index,2)
+                        str = [str,num2str(double(c(rowindex,kk))),','];
                     end
                 elseif ischar(c)
-                    str = ['"',c(ii,:),'",'];
+                    str = ['"',c(rowindex,:),'",'];
                 elseif iscell(c)
                     if isnumeric(c{1,1})
-                        for kk = 1:sz(jj,2)
-                            str = [str,num2str(c{ii,kk}),','];
+                        for kk = 1:field_sizes(current_field_index,2)
+                            str = [str,num2str(c{rowindex,kk},precision),','];
                         end
                     elseif islogical(c{1,1})
-                        for kk = 1:sz(jj,2)
-                            str = [str,num2str(double(c{ii,kk})),','];
+                        for kk = 1:field_sizes(current_field_index,2)
+                            str = [str,num2str(double(c{rowindex,kk})),','];
                         end
                     elseif ischar(c{1,1})
-                        for kk = 1:sz(jj,2)
-                            str = [str,'"',c{ii,kk},'",'];
+                        for kk = 1:field_sizes(current_field_index,2)
+                            str = [str,'"',c{rowindex,kk},'",'];
                         end
                     end
                 end
